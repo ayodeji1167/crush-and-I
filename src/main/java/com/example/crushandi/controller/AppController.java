@@ -1,6 +1,8 @@
 package com.example.crushandi.controller;
 
 import com.example.crushandi.dto.PredictionData;
+import com.example.crushandi.dto.ReturnedResult;
+import com.example.crushandi.service.LoveQuotesService;
 import com.example.crushandi.service.PredictionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,9 +16,11 @@ import org.springframework.web.bind.annotation.*;
 public class AppController {
 
     private final PredictionService predictionService;
+    private final LoveQuotesService loveQuotesService;
 
-    public AppController(PredictionService predictionService) {
+    public AppController(PredictionService predictionService, LoveQuotesService loveQuotesService) {
         this.predictionService = predictionService;
+        this.loveQuotesService = loveQuotesService;
     }
 
 
@@ -28,12 +32,12 @@ public class AppController {
     )
 
     @PostMapping("/result")
-    public ResponseEntity<String> getResult(@RequestBody PredictionData predictionData) {
+    public ResponseEntity<?> getResult(@RequestBody PredictionData predictionData) {
         String userName = predictionData.getUserName();
         String crushName = predictionData.getCrushName();
 
         try {
-            String result = predictionService.result(userName, crushName);
+            ReturnedResult result = predictionService.result(userName, crushName);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -41,8 +45,13 @@ public class AppController {
     }
 
     @GetMapping("/welcome")
-    public String welcomeMessage(){
+    public String welcomeMessage() {
         return "Welcome To The Relationship Prediction Application";
+    }
+
+    @GetMapping("/love-quotes")
+    public ResponseEntity<?> getLoveQuotes() {
+        return new ResponseEntity<>(loveQuotesService.returnLoveQuotes(), HttpStatus.OK);
     }
 
 }
