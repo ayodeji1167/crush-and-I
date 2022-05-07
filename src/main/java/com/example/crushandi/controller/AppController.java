@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +46,7 @@ public class AppController {
                     content = @Content)})
 
     @PostMapping("/result")
-    public ResponseEntity<?> getResult(@RequestBody PredictionData predictionData) {
+    public ResponseEntity<?> getResult(@RequestBody @Valid PredictionData predictionData) {
         String userName = predictionData.getUserName();
         String crushName = predictionData.getCrushName();
 

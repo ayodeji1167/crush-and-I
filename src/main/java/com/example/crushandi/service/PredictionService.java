@@ -16,8 +16,12 @@ public class PredictionService {
         String trimmedCrushName = crushName.trim();
 
         if (trimmedUserName.charAt(0) == trimmedCrushName.charAt(0)) {
+            if (trimmedUserName.charAt(trimmedUserName.length() - 1) == trimmedCrushName.charAt(trimmedCrushName.length() - 1)) {
+                return returnMessageForFirstAndLastAlphabet(trimmedUserName.charAt(0), trimmedUserName.charAt(trimmedUserName.length() - 1));
+            }
             return returnMessageForSameInitials();
         }
+
         if (trimmedUserName.length() == trimmedCrushName.length()) {
             return returnMessageForSameLength(userName);
         }
@@ -52,13 +56,19 @@ public class PredictionService {
     }
 
     public ReturnedResult returnMessageForSameInitials() {
-        return new ReturnedResult("Wow, you have the same initial as your crush...She probably is in love already, lol.", 0);
+        return new ReturnedResult("Wow, you have the same initial as your crush...Sign of a beautiful start, don't be scared to send a DM.", 0);
+    }
+
+    public ReturnedResult returnMessageForFirstAndLastAlphabet(Character firstAlphabet, Character secondAlphabet) {
+        return new ReturnedResult("Wow, the first and last alphabet of you and your crush name is  the same (" + firstAlphabet + "," + secondAlphabet + ") " +
+                "that's rare, you two are probably in love already."
+                , 0);
     }
 
     public ReturnedResult returnMessageForSameLength(String userName) {
         int lengthOfNames = userName.trim().length();
         return new ReturnedResult("Wow, You and your Crush have the same number of alphabet in your names(" + lengthOfNames + ")...hmmm," +
-                " looks like you're made for each other", 0);
+                " looks like you're made for each other.", 0);
     }
 
 
