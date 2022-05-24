@@ -1,9 +1,9 @@
 package com.example.crushandi.controller;
 
-import com.example.crushandi.dto.LoveQuotes;
-import com.example.crushandi.dto.PickUpLines;
-import com.example.crushandi.dto.PredictionData;
+
 import com.example.crushandi.dto.ReturnedResult;
+import com.example.crushandi.dto.request.PredictionData;
+import com.example.crushandi.entity.LoveQuotes;
 import com.example.crushandi.service.LoveQuotesService;
 import com.example.crushandi.service.PickUpLineService;
 import com.example.crushandi.service.PredictionService;
@@ -17,9 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -79,20 +77,8 @@ public class AppController {
 
     @GetMapping("/love-quotes")
     public ResponseEntity<?> getLoveQuotes() {
-        return new ResponseEntity<>(loveQuotesService.returnLoveQuotes(), HttpStatus.OK);
+        return new ResponseEntity<>(loveQuotesService.getAllLoveQuotes(), HttpStatus.OK);
     }
 
-    @Operation(summary = "Get PickUp Lines")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List Of Pickup Lines",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = PickUpLines.class))}),
-            @ApiResponse(responseCode = "400", description = "Bad Request",
-                    content = @Content)})
-
-    @GetMapping("/pickup-lines")
-    public ResponseEntity<?> getPickUpLines() {
-        return new ResponseEntity<>(pickUpLineService.getPickUpLines(), HttpStatus.OK);
-    }
 
 }

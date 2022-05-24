@@ -10,12 +10,9 @@ public class ProjectConfig {
     @Bean
     public OpenAPI springShopOpenAPI() {
         return new OpenAPI()
-                .info(new Info().title("Crush and I API")
-                        .description("Crush and I Api Documentation")
+                .info(new Info().title("Blog  API")
+                        .description("Blog Api Documentation")
                         .version("v0.0.1")
-
                 );
     }
-
-
 }
