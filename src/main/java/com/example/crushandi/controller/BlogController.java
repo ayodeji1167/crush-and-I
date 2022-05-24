@@ -32,7 +32,7 @@ public class BlogController {
             blogPost.setCategory("all");
             blogPost.setContent("This is the Blog Content");
             blogPost.setTitle("TITLE");
-            blogPost.setUserId(2L);
+            blogPost.setUserId(1L);
             blogPostService.createBlogPost(blogPost);
         });
     }
