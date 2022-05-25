@@ -23,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -135,5 +137,10 @@ public class BlogPostServiceImpl implements BlogPostService {
         blogPost.setContent(createPostRequest.getContent());
         blogPost.setImageName(createPostRequest.getImageName());
 
+        LocalDate date = LocalDate.now();
+        String formattedDate = date.format(DateTimeFormatter.ofPattern("MMMM dd yyyy"));
+
+        blogPost.setCreatedDate(formattedDate);
+        blogPost.setUpdatedDate(formattedDate);
     }
 }

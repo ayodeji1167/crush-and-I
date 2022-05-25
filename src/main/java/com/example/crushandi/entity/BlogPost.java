@@ -1,11 +1,11 @@
 package com.example.crushandi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -37,11 +37,11 @@ public class BlogPost {
     private int view;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
+    @JsonIgnoreProperties(value = {"role", "email", "password"})
     private AppUser appUser;
 
-    @CreationTimestamp
-    private LocalDate createdDate;
+    private String createdDate;
 
-    @UpdateTimestamp
-    private LocalDate updatedDate;
+    private String updatedDate;
+
 }

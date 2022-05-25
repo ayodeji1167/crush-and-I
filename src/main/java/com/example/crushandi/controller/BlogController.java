@@ -26,7 +26,7 @@ public class BlogController {
     //POPULATE BLOG DB
     @GetMapping("/populate")
     public void populateDbForTest() {
-        IntStream.rangeClosed(1, 50).forEach(i -> {
+        IntStream.rangeClosed(1, 40).forEach(i -> {
             CreatePostRequest blogPost = new CreatePostRequest();
             blogPost.setImageName("image");
             blogPost.setCategory("all");
