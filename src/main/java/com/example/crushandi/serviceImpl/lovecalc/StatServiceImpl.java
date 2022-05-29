@@ -19,13 +19,13 @@ public class StatServiceImpl {
         this.statisticsRepository = statisticsRepository;
     }
 
-    @Scheduled(fixedDelay = 1000*30 )
+    @Scheduled(fixedDelay = 1000*60 )
     public void createStatObj()throws InterruptedException{
         Statistics statistics = new Statistics();
         statisticsRepository.save(statistics);
     }
 
-    @Scheduled(fixedDelay = 1000*30 )
+    @Scheduled(fixedDelay = 1000*60 )
     public void setNewStat()throws InterruptedException{
         List<Statistics> statistics = statisticsRepository.findAll(Sort.by("id").descending());
         Statistics theRealStat = statistics.get(0);
