@@ -26,7 +26,7 @@ public class BlogPost {
     private String title;
 
     @NotBlank
-    @Column(length = 1000)
+    @Lob
     private String content;
 
     private String imageName;
