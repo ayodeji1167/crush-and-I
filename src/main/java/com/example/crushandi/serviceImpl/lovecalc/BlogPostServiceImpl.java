@@ -135,7 +135,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         blogPost.setTitle(createPostRequest.getTitle());
         blogPost.setCategory(createPostRequest.getCategory());
         blogPost.setContent(createPostRequest.getContent());
-        blogPost.setImageName(createPostRequest.getImageName());
+        blogPost.setMainImage(createPostRequest.getImageName());
 
         LocalDate date = LocalDate.now();
         String formattedDate = date.format(DateTimeFormatter.ofPattern("MMMM dd yyyy"));

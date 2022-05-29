@@ -1,15 +1,16 @@
 package com.example.crushandi.entity;
 
+import com.example.crushandi.utils.PostImage;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -29,7 +30,11 @@ public class BlogPost {
     @Lob
     private String content;
 
-    private String imageName;
+    @Column(nullable = false )
+    private String mainImage;
+
+    @OneToMany(mappedBy = "blogPost" , cascade = CascadeType.PERSIST)
+    private Set<PostImage> images = new HashSet<>();
 
     @NotBlank
     private String category;
@@ -43,5 +48,10 @@ public class BlogPost {
     private String createdDate;
 
     private String updatedDate;
+
+
+    public void addExtraImages(String imageName){
+        this.images.add(new PostImage(imageName,this));
+    }
 
 }

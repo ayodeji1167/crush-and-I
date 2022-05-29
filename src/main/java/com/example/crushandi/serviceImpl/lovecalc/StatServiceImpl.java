@@ -19,22 +19,22 @@ public class StatServiceImpl {
         this.statisticsRepository = statisticsRepository;
     }
 
-    @Scheduled(fixedDelay = 1000*60 )
-    public void createStatObj()throws InterruptedException{
-        Statistics statistics = new Statistics();
-        statisticsRepository.save(statistics);
-    }
-
-    @Scheduled(fixedDelay = 1000*60 )
-    public void setNewStat()throws InterruptedException{
-        List<Statistics> statistics = statisticsRepository.findAll(Sort.by("id").descending());
-        Statistics theRealStat = statistics.get(0);
-
-        LocalDateTime date = LocalDateTime.now();
-        String formattedDate = date.format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss"));
-        System.out.println(formattedDate);
-
-        theRealStat.setDate(formattedDate);
-        statisticsRepository.save(theRealStat);
-    }
+//    @Scheduled(fixedDelay = 1000*60 )
+//    public void createStatObj()throws InterruptedException{
+//        Statistics statistics = new Statistics();
+//        statisticsRepository.save(statistics);
+//    }
+//
+//    @Scheduled(fixedDelay = 1000*60 )
+//    public void setNewStat()throws InterruptedException{
+//        List<Statistics> statistics = statisticsRepository.findAll(Sort.by("id").descending());
+//        Statistics theRealStat = statistics.get(0);
+//
+//        LocalDateTime date = LocalDateTime.now();
+//        String formattedDate = date.format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss"));
+//        System.out.println(formattedDate);
+//
+//        theRealStat.setDate(formattedDate);
+//        statisticsRepository.save(theRealStat);
+//    }
 }
