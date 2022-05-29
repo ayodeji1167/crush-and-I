@@ -33,8 +33,8 @@ public class BlogPost {
     @Column(nullable = false )
     private String mainImage;
 
-    @OneToMany(mappedBy = "blogPost" , cascade = CascadeType.PERSIST)
-    private Set<PostImage> images = new HashSet<>();
+//    @OneToMany(mappedBy = "blogPost" , cascade = CascadeType.PERSIST)
+//    private Set<PostImage> images = new HashSet<>();
 
     @NotBlank
     private String category;
@@ -49,9 +49,9 @@ public class BlogPost {
 
     private String updatedDate;
 
-
-    public void addExtraImages(String imageName){
-        this.images.add(new PostImage(imageName,this));
-    }
+//
+//    //public void addExtraImages(String imageName){
+//        this.images.add(new PostImage(imageName,this));
+//    }
 
 }

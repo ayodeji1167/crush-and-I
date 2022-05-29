@@ -23,16 +23,16 @@ public class BlogPostTest {
     @Test
     public void testSavePostWithImages(){
 
-        Long postId = 1L;
-        BlogPost blogPost = blogPostRepository.findById(postId).get();
-
-        blogPost.setMainImage("main_image.jpg");
-
-        blogPost.addExtraImages("extra image1.png");
-        blogPost.addExtraImages("extra image2.png");
-        blogPost.addExtraImages("extra image3.png");
-
-        blogPostRepository.save(blogPost);
+//        Long postId = 1L;
+//        BlogPost blogPost = blogPostRepository.findById(postId).get();
+//
+//        blogPost.setMainImage("main_image.jpg");
+//
+////        blogPost.addExtraImages("extra image1.png");
+////        blogPost.addExtraImages("extra image2.png");
+////        blogPost.addExtraImages("extra image3.png");
+//
+//        blogPostRepository.save(blogPost);
 
     }
 
