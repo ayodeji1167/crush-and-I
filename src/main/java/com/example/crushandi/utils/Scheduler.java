@@ -20,7 +20,7 @@ public class Scheduler {
     }
 
 
-    @Scheduled(fixedRate = 1000*60*60)
+    @Scheduled(fixedRateString = "PT01H")
     public void setNewStat() {
         Statistics statistics = new Statistics();
 
