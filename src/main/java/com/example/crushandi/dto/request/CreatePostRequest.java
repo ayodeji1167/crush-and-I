@@ -17,7 +17,7 @@ public class CreatePostRequest {
 
     private String imageName;
 
-    private Long userId;
+    private String userId;
 
 
 }

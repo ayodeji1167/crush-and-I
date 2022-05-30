@@ -10,11 +10,11 @@ import java.util.List;
 public interface PickUpLineService {
     List<PickUpLines> getAllPickUpLines();
 
-    PickUpLines getPickUpById(Long id);
+    PickUpLines getPickUpById(String id);
 
     void addPickUpFromApi() throws URISyntaxException;
 
-    void deletePickUpLine(Long id);
+    void deletePickUpLine(String id);
 
 
 }

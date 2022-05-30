@@ -48,7 +48,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     }
 
     @Override
-    public void editPost(Long id, CreatePostRequest createPostRequest) {
+    public void editPost(String id, CreatePostRequest createPostRequest) {
         BlogPost blogPost = blogPostRepository.findById(id).orElseThrow(() -> new BlogPostException("Post Not Found"));
         mapRequestToEntity(blogPost, createPostRequest);
         blogPost.setId(id);
@@ -56,7 +56,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     }
 
     @Override
-    public void deletePostById(Long id) {
+    public void deletePostById(String id) {
         BlogPost blogPost = blogPostRepository.findById(id).orElseThrow(() -> new BlogPostException("Post Not Found"));
         blogPostRepository.delete(blogPost);
     }
@@ -81,17 +81,17 @@ public class BlogPostServiceImpl implements BlogPostService {
     }
 
     @Override
-    public void deleteAllPostByUserId(Long id) {
+    public void deleteAllPostByUserId(String id) {
         blogPostRepository.deleteBlogPostsByAppUserId(id);
     }
 
     @Override
-    public List<BlogPost> getAllPostByUserId(Long id) {
+    public List<BlogPost> getAllPostByUserId(String id) {
         return blogPostRepository.findAllByAppUser_Id(id);
     }
 
     @Override
-    public BlogPost getPostById(Long id) {
+    public BlogPost getPostById(String id) {
         BlogPost blogPost = blogPostRepository.findById(id).orElseThrow(() -> new BlogPostException("Post Not Found"));
         blogPost.setView(blogPost.getView() + 1);
         blogPostRepository.save(blogPost);
@@ -132,9 +132,9 @@ public class BlogPostServiceImpl implements BlogPostService {
     }
 
     @Override
-    public BlogPost addComment(Long postId, String name , String content) {
+    public BlogPost addComment(String postId, String name, String content) {
         BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new BlogPostException("Post Not Found"));
-        blogPost.addComment(name,content);
+        blogPost.addComment(name, content);
         return blogPostRepository.save(blogPost);
     }
 

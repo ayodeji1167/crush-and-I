@@ -30,13 +30,13 @@ public class PickUpLinesController {
     }
 
     @GetMapping("/get/{id}")
-    private PickUpLines getById(@PathVariable Long id) {
+    private PickUpLines getById(@PathVariable String id) {
         return pickUpLineService.getPickUpById(id);
     }
 
 
     @DeleteMapping("/delete/{id}")
-    private void deleteById(@PathVariable Long id) {
+    private void deleteById(@PathVariable String id) {
         pickUpLineService.deletePickUpLine(id);
     }
 }

@@ -28,7 +28,7 @@ public class LoveQuotesServiceImpl implements LoveQuotesService {
     }
 
     @Override
-    public LoveQuotes getQuoteById(Long id) {
+    public LoveQuotes getQuoteById(String id) {
         return loveQuotesRepository.findById(id).orElseThrow(() -> new LoveAppException("Quotes with id " + id + " not found"));
     }
 
@@ -54,7 +54,7 @@ public class LoveQuotesServiceImpl implements LoveQuotesService {
     }
 
     @Override
-    public void deleteLoveQuotesById(Long id) {
+    public void deleteLoveQuotesById(String id) {
         loveQuotesRepository.deleteById(id);
     }
 }

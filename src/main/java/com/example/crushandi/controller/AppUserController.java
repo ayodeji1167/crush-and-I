@@ -31,7 +31,7 @@ public class AppUserController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public void deleteEditor(@PathVariable Long id) {
+    public void deleteEditor(@PathVariable String id) {
         blogPostService.deleteAllPostByUserId(id);
         appUserService.deleteUserById(id);
     }

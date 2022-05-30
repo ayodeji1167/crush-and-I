@@ -46,7 +46,7 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public void deleteUserById(Long id) {
+    public void deleteUserById(String id) {
         appUserRepository.deleteById(id);
     }
 }

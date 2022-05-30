@@ -10,11 +10,11 @@ public interface LoveQuotesService {
 
     List<LoveQuotes> getAllLoveQuotes();
 
-    LoveQuotes getQuoteById(Long id);
+    LoveQuotes getQuoteById(String id);
 
     void addLoveQuotesFromApi() throws URISyntaxException;
 
-    void deleteLoveQuotesById(Long id);
+    void deleteLoveQuotesById(String id);
 
 
 }

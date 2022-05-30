@@ -29,7 +29,7 @@ public class PickUpLineServiceImpl implements PickUpLineService {
     }
 
     @Override
-    public PickUpLines getPickUpById(Long id) {
+    public PickUpLines getPickUpById(String id) {
         return pickUpLinesRepository.findById(id).orElseThrow(() -> new LoveAppException("Pickup line not found"));
     }
 
@@ -52,7 +52,7 @@ public class PickUpLineServiceImpl implements PickUpLineService {
     }
 
     @Override
-    public void deletePickUpLine(Long id) {
+    public void deletePickUpLine(String id) {
         pickUpLinesRepository.deleteById(id);
     }
 }

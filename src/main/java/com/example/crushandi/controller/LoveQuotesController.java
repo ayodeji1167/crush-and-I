@@ -31,13 +31,13 @@ public class LoveQuotesController {
     }
 
     @GetMapping("/get/{id}")
-    private LoveQuotes getById(@PathVariable Long id) {
+    private LoveQuotes getById(@PathVariable String id) {
         return loveQuotesService.getQuoteById(id);
     }
 
 
     @DeleteMapping("/delete/{id}")
-    private void deleteById(@PathVariable Long id) {
+    private void deleteById(@PathVariable String id) {
         loveQuotesService.deleteLoveQuotesById(id);
     }
 

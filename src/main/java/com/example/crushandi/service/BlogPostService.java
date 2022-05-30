@@ -11,9 +11,9 @@ import java.util.List;
 public interface BlogPostService {
     void createBlogPost(CreatePostRequest createPostRequest);
 
-    void editPost(Long id, CreatePostRequest createPostRequest);
+    void editPost(String id, CreatePostRequest createPostRequest);
 
-    void deletePostById(Long id);
+    void deletePostById(String id);
 
     List<BlogPost> getAllPost();
 
@@ -21,16 +21,16 @@ public interface BlogPostService {
 
     BlogPost getBlogWithHighestView();
 
-    void deleteAllPostByUserId(Long id);
+    void deleteAllPostByUserId(String id);
 
-    List<BlogPost> getAllPostByUserId(Long id);
+    List<BlogPost> getAllPostByUserId(String id);
 
-    BlogPost getPostById(Long id);
+    BlogPost getPostById(String id);
 
     void uploadImage(MultipartFile multipartFile);
 
     Resource returnImage(String imageName);
 
-    BlogPost addComment(Long postId, String name , String content);
+    BlogPost addComment(String postId, String name, String content);
 
 }

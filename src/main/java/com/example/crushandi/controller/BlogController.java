@@ -8,13 +8,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @RestController
 @RequestMapping("/api/blog")
@@ -25,20 +23,20 @@ public class BlogController {
         this.blogPostService = blogPostService;
     }
 
-    //POPULATE BLOG DB
-    @GetMapping("/populate")
-    @Transactional
-    public void populateDbForTest() {
-        IntStream.rangeClosed(1, 40).forEach(i -> {
-            CreatePostRequest blogPost = new CreatePostRequest();
-            blogPost.setImageName("image");
-            blogPost.setCategory("all");
-            blogPost.setContent("This is the Blog Content");
-            blogPost.setTitle("TITLE");
-            blogPost.setUserId(1L);
-            blogPostService.createBlogPost(blogPost);
-        });
-    }
+//    //POPULATE BLOG DB
+//    @GetMapping("/populate")
+//    @Transactional
+//    public void populateDbForTest() {
+//        IntStream.rangeClosed(1, 40).forEach(i -> {
+//            CreatePostRequest blogPost = new CreatePostRequest();
+//            blogPost.setImageName("image");
+//            blogPost.setCategory("all");
+//            blogPost.setContent("This is the Blog Content");
+//            blogPost.setTitle("TITLE");
+//            blogPost.setUserId(1L);
+//            blogPostService.createBlogPost(blogPost);
+//        });
+//    }
 
     @GetMapping("/get/all")
     public List<BlogPost> getAllPost() {
@@ -58,7 +56,7 @@ public class BlogController {
     }
 
     @PostMapping("/add/Comment/{id}")
-    public BlogPost addComment(@PathVariable Long id , @RequestBody Comment comment){
+    public BlogPost addComment(@PathVariable String id, @RequestBody Comment comment) {
         return blogPostService.addComment(id, comment.getName(), comment.getContent());
     }
 
@@ -80,12 +78,12 @@ public class BlogController {
     }
 
     @GetMapping("/get/{id}")
-    public BlogPost getPostById(@PathVariable Long id) {
+    public BlogPost getPostById(@PathVariable String id) {
         return blogPostService.getPostById(id);
     }
 
     @GetMapping("/get/all/{id}")
-    public List<BlogPost> getAllPostsById(@PathVariable Long id) {
+    public List<BlogPost> getAllPostsById(@PathVariable String id) {
         return blogPostService.getAllPostByUserId(id);
     }
 
@@ -96,18 +94,18 @@ public class BlogController {
     }
 
     @PutMapping("/edit/{id}")
-    public void editPost(@PathVariable Long id, @RequestBody @Valid CreatePostRequest createPostRequest) {
+    public void editPost(@PathVariable String id, @RequestBody @Valid CreatePostRequest createPostRequest) {
 
         blogPostService.editPost(id, createPostRequest);
     }
 
     @DeleteMapping("/delete/{id}")
-    public void deletePost(@PathVariable Long id) {
+    public void deletePost(@PathVariable String id) {
         blogPostService.deletePostById(id);
     }
 
     @DeleteMapping("/delete/all/{id}")
-    public void deletePostsByUserId(@PathVariable Long id) {
+    public void deletePostsByUserId(@PathVariable String id) {
         blogPostService.deleteAllPostByUserId(id);
     }
 

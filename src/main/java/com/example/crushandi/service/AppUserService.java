@@ -11,7 +11,7 @@ public interface AppUserService {
 
     List<AppUser> getAllEditors();
 
-    void deleteUserById(Long id);
+    void deleteUserById(String id);
 
 
 }
