@@ -2,11 +2,13 @@ package com.example.crushandi.controller;
 
 import com.example.crushandi.dto.request.CreatePostRequest;
 import com.example.crushandi.entity.BlogPost;
+import com.example.crushandi.entity.Comment;
 import com.example.crushandi.service.BlogPostService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +27,7 @@ public class BlogController {
 
     //POPULATE BLOG DB
     @GetMapping("/populate")
+    @Transactional
     public void populateDbForTest() {
         IntStream.rangeClosed(1, 40).forEach(i -> {
             CreatePostRequest blogPost = new CreatePostRequest();
@@ -54,6 +57,10 @@ public class BlogController {
         return blogPostService.getBlogWithHighestView();
     }
 
+    @PostMapping("/add/Comment/{id}")
+    public BlogPost addComment(@PathVariable Long id , @RequestBody Comment comment){
+        return blogPostService.addComment(id, comment.getName(), comment.getContent());
+    }
 
     @PostMapping("/upload/image")
     public void uploadImage(@RequestParam("file") MultipartFile multipartFile) {

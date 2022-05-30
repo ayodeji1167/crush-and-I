@@ -18,4 +18,17 @@ public class Comment {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    private String name;
+
+    private String content;
+
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private BlogPost post;
+
+    public Comment(String name, String content,BlogPost blogPost){
+        this.name = name;
+        this.content = content;
+        this.post = blogPost;
+    }
 }

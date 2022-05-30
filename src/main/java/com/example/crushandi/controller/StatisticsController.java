@@ -2,38 +2,36 @@ package com.example.crushandi.controller;
 
 import com.example.crushandi.entity.Statistics;
 import com.example.crushandi.repository.StatisticsRepository;
-import com.example.crushandi.serviceImpl.lovecalc.StatServiceImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/stat")
 public class StatisticsController {
 
-    private final StatServiceImpl service;
     private final StatisticsRepository statisticsRepository;
 
-    public StatisticsController(StatServiceImpl service, StatisticsRepository statisticsRepository) {
-        this.service = service;
+    public StatisticsController(StatisticsRepository statisticsRepository) {
         this.statisticsRepository = statisticsRepository;
     }
 
 
     @GetMapping
-    public ResponseEntity<?> getAllStat() {
-            return ResponseEntity.ok(statisticsRepository.findAll());
+    public Page<Statistics> getAllStat() {
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
+        return statisticsRepository.findAll(pageable);
     }
 
     @GetMapping("/count")
     public void addToCount() {
-        List<Statistics> statistics = statisticsRepository.findAll(Sort.by("id").descending());
-        Statistics theRealStat = statistics.get(0);
-        theRealStat.setViews(theRealStat.getViews() + 1);
-        statisticsRepository.save(theRealStat);
+        Statistics statistics = statisticsRepository.findAll(Sort.by("id").descending()).get(0);
+        statistics.setViews(statistics.getViews() + 1);
+        statisticsRepository.save(statistics);
+
     }
 }

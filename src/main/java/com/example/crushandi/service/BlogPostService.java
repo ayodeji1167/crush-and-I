@@ -31,4 +31,6 @@ public interface BlogPostService {
 
     Resource returnImage(String imageName);
 
+    BlogPost addComment(Long postId, String name , String content);
+
 }

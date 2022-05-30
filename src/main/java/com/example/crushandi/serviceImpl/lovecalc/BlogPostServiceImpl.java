@@ -43,6 +43,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         BlogPost blogPost = new BlogPost();
         blogPost.setAppUser(appUserRepository.findById(createPostRequest.getUserId()).get());
         mapRequestToEntity(blogPost, createPostRequest);
+
         blogPostRepository.save(blogPost);
     }
 
@@ -98,7 +99,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     }
 
     @Override
-    public void uploadImage(MultipartFile multipartFile) {
+    public void uploadImage(MultipartFile multipartFile ) {
         try {
             String imageDirectory = "./src/main/resources/static/" + StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
             Path uploadDir = Paths.get(imageDirectory);
@@ -128,6 +129,13 @@ public class BlogPostServiceImpl implements BlogPostService {
         }
         return resource;
 
+    }
+
+    @Override
+    public BlogPost addComment(Long postId, String name , String content) {
+        BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new BlogPostException("Post Not Found"));
+        blogPost.addComment(name,content);
+        return blogPostRepository.save(blogPost);
     }
 
     //UTIL METHODS

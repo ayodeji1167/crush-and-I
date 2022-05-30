@@ -1,23 +1,19 @@
 package com.example.crushandi.entity;
 
-import com.example.crushandi.utils.PostImage;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-
+@ToString
 public class BlogPost {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,8 +29,12 @@ public class BlogPost {
     @Column(nullable = false )
     private String mainImage;
 
-//    @OneToMany(mappedBy = "blogPost" , cascade = CascadeType.PERSIST)
+//    @OneToMany(mappedBy = "blogPost" , cascade = CascadeType.ALL)
 //    private Set<PostImage> images = new HashSet<>();
+
+    @OneToMany(mappedBy = "post",
+            cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
 
     @NotBlank
     private String category;
@@ -50,8 +50,12 @@ public class BlogPost {
     private String updatedDate;
 
 //
-//    //public void addExtraImages(String imageName){
+//    public void addExtraImages(String imageName){
 //        this.images.add(new PostImage(imageName,this));
 //    }
+
+    public void addComment(String name, String content){
+        this.comments.add(new Comment(name,content,this));
+    }
 
 }
