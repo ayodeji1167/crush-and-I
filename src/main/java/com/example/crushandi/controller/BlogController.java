@@ -47,12 +47,20 @@ public class BlogController {
     public ResponseEntity<?> getPaginatedBlogs(@RequestParam("offSet") int offSet,
                                                @RequestParam("pageSize") int pageSize,
                                                @RequestParam("category") String category) {
+        System.out.println("i was called");
         return ResponseEntity.ok(blogPostService.paginatedBlog(offSet, pageSize, category));
+
     }
 
     @GetMapping("/get/trending")
     public BlogPost getTrendingBlog() {
         return blogPostService.getBlogWithHighestView();
+    }
+
+
+    @GetMapping("/get/popular")
+    public List<BlogPost> getPopularPost() {
+        return blogPostService.getPopularPosts();
     }
 
     @PostMapping("/add/Comment/{id}")

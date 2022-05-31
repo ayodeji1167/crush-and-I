@@ -27,7 +27,7 @@ public class Scheduler {
 
         LocalDateTime date = LocalDateTime.now();
         String formattedDate = date.format(DateTimeFormatter.ofPattern("dd-MMMM-yyyy HH:mm:ss"));
-        System.out.println(formattedDate);
+
 
         statistics.setDate(formattedDate);
         statisticsRepository.save(statistics);

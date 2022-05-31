@@ -25,8 +25,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class BlogPostServiceImpl implements BlogPostService {
@@ -64,6 +66,19 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     public List<BlogPost> getAllPost() {
         return blogPostRepository.findAll();
+    }
+
+    @Override
+    public List<BlogPost> getPopularPosts() {
+        List<BlogPost> blogPosts = blogPostRepository.findAll(Sort.by("view").descending());
+        List<BlogPost> top3Post = new ArrayList<>();
+        int i = 0;
+        for (BlogPost p : blogPosts){
+            top3Post.add(p);
+            i++;
+            if(i == 3) break;
+        }
+        return top3Post;
     }
 
     public Page<BlogPost> paginatedBlog(int offSet, int pageSize, String category) {

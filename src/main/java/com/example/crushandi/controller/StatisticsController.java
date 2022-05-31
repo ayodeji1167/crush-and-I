@@ -33,5 +33,7 @@ public class StatisticsController {
         statistics.setViews(statistics.getViews() + 1);
         statisticsRepository.save(statistics);
 
+        System.out.println("I just entered stats");
+
     }
 }
