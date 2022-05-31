@@ -95,6 +95,25 @@ public class BlogPostServiceImpl implements BlogPostService {
         return blogPosts.get(0);
     }
 
+    public List<BlogPost> getRelatedPost(String blogPostId) {
+        //First Get The Currently Viewed Blog Post
+        BlogPost blogPost = blogPostRepository.findById(blogPostId).get();
+
+        //Create a List for related post
+        List<BlogPost> relatedPost = new ArrayList<>();
+
+        //Now Loop through all the post in the currentPost category
+       List<BlogPost> allThePostInTheCategoryOfThePost =  blogPostRepository.findByCategory(blogPost.getCategory());
+
+      for (BlogPost p : allThePostInTheCategoryOfThePost){
+          if(relatedPost.size() == 3) break; //If the related post array don reach 3, e go leave the loop
+          if (p == blogPost) continue; //if the  currently looped post na the viewed one, e go skip the add (below) and go up again
+          relatedPost.add(p);
+      }
+
+      return relatedPost;
+    }
+
     @Override
     public void deleteAllPostByUserId(String id) {
         blogPostRepository.deleteBlogPostsByAppUserId(id);
