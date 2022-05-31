@@ -17,6 +17,8 @@ public interface BlogPostService {
 
     List<BlogPost> getAllPost();
 
+    List<BlogPost> getPopularPosts();
+
     Page<BlogPost> paginatedBlog(int offSet, int pageSize, String category);
 
     BlogPost getBlogWithHighestView();
