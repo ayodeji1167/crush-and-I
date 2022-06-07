@@ -42,7 +42,7 @@ public class Scheduler implements CommandLineRunner {
 
     }
 
-//
+
 //    @Scheduled(fixedRateString = "PT01H")
 //    public void setNewStat() {
 //        Statistics statistics = new Statistics();
@@ -54,8 +54,8 @@ public class Scheduler implements CommandLineRunner {
 //
 //        statistics.setDate(formattedDate);
 //        statisticsRepository.save(statistics);
-//    }
-
+//  }
+//
 
 
 

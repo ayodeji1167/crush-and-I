@@ -2,9 +2,13 @@ package com.example.crushandi.serviceImpl.lovecalc;
 
 import com.example.crushandi.dto.request.CreatePostRequest;
 import com.example.crushandi.entity.BlogPost;
+import com.example.crushandi.entity.Comment;
+import com.example.crushandi.entity.Reply;
 import com.example.crushandi.exception.BlogPostException;
 import com.example.crushandi.repository.AppUserRepository;
 import com.example.crushandi.repository.BlogPostRepository;
+import com.example.crushandi.repository.CommentRepository;
+import com.example.crushandi.repository.ReplyRepository;
 import com.example.crushandi.service.BlogPostService;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -28,16 +32,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class BlogPostServiceImpl implements BlogPostService {
     private final BlogPostRepository blogPostRepository;
     private final AppUserRepository appUserRepository;
+    private final CommentRepository commentRepository;
+    private final ReplyRepository repository;
 
-    public BlogPostServiceImpl(BlogPostRepository blogPostRepository, AppUserRepository appUserRepository) {
+    public BlogPostServiceImpl(BlogPostRepository blogPostRepository, AppUserRepository appUserRepository, CommentRepository commentRepository, ReplyRepository repository) {
         this.blogPostRepository = blogPostRepository;
         this.appUserRepository = appUserRepository;
+        this.commentRepository = commentRepository;
+        this.repository = repository;
     }
 
     @Override
@@ -95,24 +102,24 @@ public class BlogPostServiceImpl implements BlogPostService {
         return blogPosts.get(0);
     }
 
-    public List<BlogPost> getRelatedPost(String blogPostId) {
-        //First Get The Currently Viewed Blog Post
-        BlogPost blogPost = blogPostRepository.findById(blogPostId).get();
-
-        //Create a List for related post
-        List<BlogPost> relatedPost = new ArrayList<>();
-
-        //Now Loop through all the post in the currentPost category
-       List<BlogPost> allThePostInTheCategoryOfThePost =  blogPostRepository.findByCategory(blogPost.getCategory());
-
-      for (BlogPost p : allThePostInTheCategoryOfThePost){
-          if(relatedPost.size() == 3) break; //If the related post array don reach 3, e go leave the loop
-          if (p == blogPost) continue; //if the  currently looped post na the viewed one, e go skip the add (below) and go up again
-          relatedPost.add(p);
-      }
-
-      return relatedPost;
-    }
+//    public List<BlogPost> getRelatedPost(String blogPostId) {
+//        //First Get The Currently Viewed Blog Post
+//        BlogPost blogPost = blogPostRepository.findById(blogPostId).get();
+//
+//        //Create a List for related post
+//        List<BlogPost> relatedPost = new ArrayList<>();
+//
+//        //Now Loop through all the post in the currentPost category
+//       List<BlogPost> allThePostInTheCategoryOfThePost =  blogPostRepository.findByCategory(blogPost.getCategory());
+//
+//      for (BlogPost p : allThePostInTheCategoryOfThePost){
+//          if(relatedPost.size() == 3) break; //If the related post array don reach 3, e go leave the loop
+//          if (p == blogPost) continue; //if the  currently looped post na the viewed one, e go skip the add (below) and go up again
+//          relatedPost.add(p);
+//      }
+//
+//      return relatedPost;
+//    }
 
     @Override
     public void deleteAllPostByUserId(String id) {
@@ -168,7 +175,33 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     public BlogPost addComment(String postId, String name, String content) {
         BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new BlogPostException("Post Not Found"));
-        blogPost.addComment(name, content);
+
+        Comment comment = commentRepository.save(new Comment(name, content, postId));
+
+        blogPost.getComments().add(comment);
+        return blogPostRepository.save(blogPost);
+    }
+
+    @Override
+    public BlogPost addReply(String postId, String commentId, String name, String content) {
+        BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new BlogPostException("Post Not Found"));
+
+        List<Comment> comment = blogPost.getComments();
+
+        Comment commentToEdit = null;
+        for (Comment comment1 : comment) {
+            if (comment1.getId().equals(commentId)) {
+                commentToEdit = comment1;
+            }
+        }
+        if (commentToEdit == null) {
+            throw new BlogPostException("Comment With Id " + commentId + " Not inside post");
+        }
+
+
+        Reply reply = repository.save(new Reply(content, name, commentId));
+        commentToEdit.getReply().add(reply);
+        commentRepository.save(commentToEdit);
         return blogPostRepository.save(blogPost);
     }
 

@@ -2,6 +2,7 @@ package com.example.crushandi.service;
 
 import com.example.crushandi.dto.request.CreatePostRequest;
 import com.example.crushandi.entity.BlogPost;
+import com.example.crushandi.entity.Comment;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,5 +35,9 @@ public interface BlogPostService {
     Resource returnImage(String imageName);
 
     BlogPost addComment(String postId, String name, String content);
+
+
+    BlogPost addReply(String postId, String commentId, String name, String content);
+
 
 }

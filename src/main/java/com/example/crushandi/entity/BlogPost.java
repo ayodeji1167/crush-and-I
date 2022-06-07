@@ -1,10 +1,8 @@
 package com.example.crushandi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document
+@ToString
 public class BlogPost {
     @Id
     private String id;
@@ -29,7 +28,8 @@ public class BlogPost {
 
     private String mainImage;
 
-    private List<Comment> comments = new ArrayList<>();
+    @JsonIgnoreProperties(value = {"post"})
+    private List<Comment> comments;
 
     @NotBlank
     private String category;
@@ -43,8 +43,6 @@ public class BlogPost {
 
     private String updatedDate;
 
-    public void addComment(String name, String content){
-        this.comments.add(new Comment(name,content,this));
-    }
+
 
 }
