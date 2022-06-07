@@ -1,8 +1,11 @@
 package com.example.crushandi.controller;
 
+import com.example.crushandi.dto.request.CommentDto;
 import com.example.crushandi.dto.request.CreatePostRequest;
+import com.example.crushandi.dto.request.ReplyDto;
 import com.example.crushandi.entity.BlogPost;
 import com.example.crushandi.entity.Comment;
+import com.example.crushandi.repository.CommentRepository;
 import com.example.crushandi.service.BlogPostService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -18,9 +21,11 @@ import java.util.List;
 @RequestMapping("/api/blog")
 public class BlogController {
     private final BlogPostService blogPostService;
+    private final CommentRepository commentRepository;
 
-    public BlogController(BlogPostService blogPostService) {
+    public BlogController(BlogPostService blogPostService, CommentRepository commentRepository) {
         this.blogPostService = blogPostService;
+        this.commentRepository = commentRepository;
     }
 
 //    //POPULATE BLOG DB
@@ -43,6 +48,13 @@ public class BlogController {
         return blogPostService.getAllPost();
     }
 
+    @GetMapping("/get/all/comment")
+    public List<Comment> getAllComment() {
+        return commentRepository.findAll();
+    }
+
+
+
     @GetMapping("/get/page")
     public ResponseEntity<?> getPaginatedBlogs(@RequestParam("offSet") int offSet,
                                                @RequestParam("pageSize") int pageSize,
@@ -64,8 +76,13 @@ public class BlogController {
     }
 
     @PostMapping("/add/Comment/{id}")
-    public BlogPost addComment(@PathVariable String id, @RequestBody Comment comment) {
+    public BlogPost addComment(@PathVariable String id, @RequestBody CommentDto comment) {
         return blogPostService.addComment(id, comment.getName(), comment.getContent());
+    }
+
+    @PostMapping("/add/reply/{postId}/{commentId}")
+    public BlogPost addReply(@PathVariable String postId,@PathVariable String commentId, @RequestBody ReplyDto replyDto) {
+        return blogPostService.addReply(postId, commentId, replyDto.getName(), replyDto.getContent());
     }
 
     @PostMapping("/upload/image")

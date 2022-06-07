@@ -1,37 +1,32 @@
 package com.example.crushandi.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@Setter
-@Getter
+@Document
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-@Document
-public class Comment {
+@Getter
+@Setter
+public class Reply {
     @Id
-    private String id;
+    private  String id;
 
     private String name;
 
     private String content;
 
     @JsonIgnore
-    private String postId;
+    private String commentId;
 
-    private List<Reply> reply = new ArrayList<>();
-
-
-
-    public Comment(String name, String content, String postId) {
-        this.name = name;
+    public Reply(String content, String name, String commentId) {
         this.content = content;
-        this.postId = postId;
+        this.name=name;
+        this.commentId = commentId;
     }
 }
