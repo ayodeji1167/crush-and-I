@@ -19,7 +19,7 @@ import java.util.TimerTask;
 public class Scheduler implements CommandLineRunner {
 
     @Autowired
-    private  StatisticsRepository statisticsRepository;
+    private StatisticsRepository statisticsRepository;
 
 
     @Override
@@ -41,7 +41,7 @@ public class Scheduler implements CommandLineRunner {
         timer.scheduleAtFixedRate(task, 0, 1000 * 60 * 60);
 
     }
-
+}
 
 //    @Scheduled(fixedRateString = "PT01H")
 //    public void setNewStat() {
@@ -59,4 +59,4 @@ public class Scheduler implements CommandLineRunner {
 
 
 
-}
+//}
