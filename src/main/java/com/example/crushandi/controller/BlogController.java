@@ -3,9 +3,9 @@ package com.example.crushandi.controller;
 import com.example.crushandi.dto.request.CommentDto;
 import com.example.crushandi.dto.request.CreatePostRequest;
 import com.example.crushandi.dto.request.ReplyDto;
+import com.example.crushandi.dto.request.UnAuthorize;
 import com.example.crushandi.entity.BlogPost;
 import com.example.crushandi.entity.Comment;
-import com.example.crushandi.repository.CommentRepository;
 import com.example.crushandi.service.BlogPostService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -21,11 +21,9 @@ import java.util.List;
 @RequestMapping("/api/blog")
 public class BlogController {
     private final BlogPostService blogPostService;
-    private final CommentRepository commentRepository;
 
-    public BlogController(BlogPostService blogPostService, CommentRepository commentRepository) {
+    public BlogController(BlogPostService blogPostService) {
         this.blogPostService = blogPostService;
-        this.commentRepository = commentRepository;
     }
 
 //    //POPULATE BLOG DB
@@ -48,12 +46,6 @@ public class BlogController {
         return blogPostService.getAllPost();
     }
 
-    @GetMapping("/get/all/comment")
-    public List<Comment> getAllComment() {
-        return commentRepository.findAll();
-    }
-
-
 
     @GetMapping("/get/page")
     public ResponseEntity<?> getPaginatedBlogs(@RequestParam("offSet") int offSet,
@@ -73,16 +65,6 @@ public class BlogController {
     @GetMapping("/get/popular")
     public List<BlogPost> getPopularPost() {
         return blogPostService.getPopularPosts();
-    }
-
-    @PostMapping("/add/Comment/{id}")
-    public BlogPost addComment(@PathVariable String id, @RequestBody CommentDto comment) {
-        return blogPostService.addComment(id, comment.getName(), comment.getContent());
-    }
-
-    @PostMapping("/add/reply/{postId}/{commentId}")
-    public BlogPost addReply(@PathVariable String postId,@PathVariable String commentId, @RequestBody ReplyDto replyDto) {
-        return blogPostService.addReply(postId, commentId, replyDto.getName(), replyDto.getContent());
     }
 
     @PostMapping("/upload/image")
@@ -114,8 +96,8 @@ public class BlogController {
 
 
     @PostMapping("/save")
-    public void savePost(@RequestBody CreatePostRequest createPostRequest) {
-        blogPostService.createBlogPost(createPostRequest);
+    public BlogPost savePost(@RequestBody CreatePostRequest createPostRequest) {
+        return blogPostService.createBlogPost(createPostRequest);
     }
 
     @PutMapping("/edit/{id}")
@@ -134,5 +116,32 @@ public class BlogController {
         blogPostService.deleteAllPostByUserId(id);
     }
 
+    // CONTROLLER FOR REPLY AND COMMENTS;
+    @PostMapping("/add/comment/{postId}")
+    public BlogPost addComment(@PathVariable String postId, @RequestBody CommentDto commentDto) {
+        return blogPostService.addComment(postId, commentDto.getName(), commentDto.getContent());
+    }
+
+    @GetMapping("/comments/getall")
+    public List<Comment> getAllComments() {
+        return blogPostService.getAllComments();
+    }
+
+    @PostMapping("/comment/unauthorize")
+    public ResponseEntity<?> unauthorizeComment(@RequestBody UnAuthorize unAuthorize) {
+        blogPostService.unAuthorize(unAuthorize.getReplyId(), unAuthorize.getCommentId(), unAuthorize.getPostId());
+        return ResponseEntity.ok().body("Process Successful");
+    }
+
+
+    @PostMapping("/add/reply/{commentId}/{postId}")
+    public BlogPost addReply(@PathVariable String postId, @RequestBody ReplyDto replyDto, @PathVariable String commentId) {
+        return blogPostService.addReply(commentId, postId, replyDto.getName(), replyDto.getContent());
+    }
+
+    @DeleteMapping("/delete/comment")
+    public BlogPost deleteReplyOrComment(@RequestBody UnAuthorize unAuthorize) {
+        return blogPostService.deleteReplyOrComment(unAuthorize.getReplyId(), unAuthorize.getCommentId(), unAuthorize.getPostId());
+    }
 
 }

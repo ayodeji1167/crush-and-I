@@ -3,6 +3,7 @@ package com.example.crushandi.service;
 import com.example.crushandi.dto.request.CreatePostRequest;
 import com.example.crushandi.entity.BlogPost;
 import com.example.crushandi.entity.Comment;
+import com.example.crushandi.entity.Reply;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface BlogPostService {
-    void createBlogPost(CreatePostRequest createPostRequest);
+    BlogPost createBlogPost(CreatePostRequest createPostRequest);
 
     void editPost(String id, CreatePostRequest createPostRequest);
 
@@ -34,10 +35,16 @@ public interface BlogPostService {
 
     Resource returnImage(String imageName);
 
+    //REPLY AND COMMENT
     BlogPost addComment(String postId, String name, String content);
 
+    List<Comment> getAllComments();
 
-    BlogPost addReply(String postId, String commentId, String name, String content);
+    BlogPost deleteReplyOrComment(String replyId, String commentId, String postId);
 
+    BlogPost addReply(String commentId, String postId, String name, String content);
 
+    List<Reply> getAllReplies();
+
+    void unAuthorize(String replyId, String commentId, String postId);
 }

@@ -1,6 +1,5 @@
 package com.example.crushandi.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -29,7 +28,7 @@ public class BlogPost {
     private String mainImage;
 
     @JsonIgnoreProperties(value = {"post"})
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     @NotBlank
     private String category;
