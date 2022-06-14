@@ -177,13 +177,13 @@ public class BlogPostServiceImpl implements BlogPostService {
         Comment comment = new Comment();
         comment.setId(UUID.randomUUID().toString());
         comment.setPostName(blogPost.getTitle());
-        comment.setAuthorized(true);
+        comment.setAuthorize(true);
         comment.setName(name);
         comment.setContent(content);
         comment.setCreatedDate(LocalDateTime.now());
         comment.setPostId(postId);
         if (badWordsCheck.isBadWordPresent(content)) {
-            comment.setAuthorized(false);
+            comment.setAuthorize(false);
         }
         List<Comment> listOfComment = blogPost.getComments();
         listOfComment.add(comment);
@@ -271,7 +271,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new BlogPostException("Post Not Found"));
         for (Comment comment : blogPost.getComments()) {
             if (comment.getId().equals(commentId)) {
-                comment.setAuthorized(!comment.isAuthorized());
+                comment.setAuthorize(!comment.isAuthorize());
             }
         }
         blogPostRepository.save(blogPost);

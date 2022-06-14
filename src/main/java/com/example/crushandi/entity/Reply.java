@@ -24,12 +24,12 @@ public class Reply {
 
     private LocalDateTime createdAt;
 
-    private boolean isAuthorize;
+    private boolean authorize;
 
-    public Reply(String content, String name, String commentId, boolean isAuthorize) {
+    public Reply(String content, String name, String commentId, boolean authorize) {
         this.content = content;
         this.name = name;
         this.commentId = commentId;
-        this.isAuthorize = isAuthorize;
+        this.authorize = authorize;
     }
 }
