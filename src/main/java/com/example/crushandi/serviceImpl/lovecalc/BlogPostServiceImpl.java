@@ -7,9 +7,8 @@ import com.example.crushandi.entity.Reply;
 import com.example.crushandi.exception.BlogPostException;
 import com.example.crushandi.repository.AppUserRepository;
 import com.example.crushandi.repository.BlogPostRepository;
-import com.example.crushandi.repository.CommentRepository;
-import com.example.crushandi.repository.ReplyRepository;
 import com.example.crushandi.service.BlogPostService;
+import com.example.crushandi.utils.BadWordsCheck;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -28,32 +27,32 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class BlogPostServiceImpl implements BlogPostService {
     private final BlogPostRepository blogPostRepository;
     private final AppUserRepository appUserRepository;
-    private final CommentRepository commentRepository;
-    private final ReplyRepository repository;
+    private final BadWordsCheck badWordsCheck;
 
-    public BlogPostServiceImpl(BlogPostRepository blogPostRepository, AppUserRepository appUserRepository, CommentRepository commentRepository, ReplyRepository repository) {
+
+    public BlogPostServiceImpl(BlogPostRepository blogPostRepository, AppUserRepository appUserRepository, BadWordsCheck badWordsCheck) {
         this.blogPostRepository = blogPostRepository;
         this.appUserRepository = appUserRepository;
-        this.commentRepository = commentRepository;
-        this.repository = repository;
+
+        this.badWordsCheck = badWordsCheck;
     }
 
     @Override
-    public void createBlogPost(CreatePostRequest createPostRequest) {
+    public BlogPost createBlogPost(CreatePostRequest createPostRequest) {
         BlogPost blogPost = new BlogPost();
         blogPost.setAppUser(appUserRepository.findById(createPostRequest.getUserId()).get());
         mapRequestToEntity(blogPost, createPostRequest);
 
-        blogPostRepository.save(blogPost);
+        return blogPostRepository.save(blogPost);
     }
 
     @Override
@@ -80,10 +79,10 @@ public class BlogPostServiceImpl implements BlogPostService {
         List<BlogPost> blogPosts = blogPostRepository.findAll(Sort.by("view").descending());
         List<BlogPost> top3Post = new ArrayList<>();
         int i = 0;
-        for (BlogPost p : blogPosts){
+        for (BlogPost p : blogPosts) {
             top3Post.add(p);
             i++;
-            if(i == 3) break;
+            if (i == 3) break;
         }
         return top3Post;
     }
@@ -140,7 +139,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     }
 
     @Override
-    public void uploadImage(MultipartFile multipartFile ) {
+    public void uploadImage(MultipartFile multipartFile) {
         try {
             String imageDirectory = "./src/main/resources/static/" + StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
             Path uploadDir = Paths.get(imageDirectory);
@@ -172,38 +171,87 @@ public class BlogPostServiceImpl implements BlogPostService {
 
     }
 
-    @Override
+    //COMMENTS AND REPLY METHODS
     public BlogPost addComment(String postId, String name, String content) {
         BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new BlogPostException("Post Not Found"));
+        Comment comment = new Comment();
+        comment.setId(UUID.randomUUID().toString());
+        comment.setPostName(blogPost.getTitle());
+        comment.setAuthorized(true);
+        comment.setName(name);
+        comment.setContent(content);
+        comment.setCreatedDate(LocalDateTime.now());
+        comment.setPostId(postId);
+        if (badWordsCheck.isBadWordPresent(content)) {
+            comment.setAuthorized(false);
+        }
+        List<Comment> listOfComment = blogPost.getComments();
+        listOfComment.add(comment);
+        blogPostRepository.save(blogPost);
+        return blogPost;
+    }
 
-        Comment comment = commentRepository.save(new Comment(name, content, postId));
+    @Override
+    public List<Comment> getAllComments() {
+        List<BlogPost> allBlogs = blogPostRepository.findAll();
+        return allBlogs.stream().map(BlogPost::getComments).flatMap(Collection::stream).collect(Collectors.toList());
+    }
 
-        blogPost.getComments().add(comment);
+    @Override
+    public BlogPost deleteReplyOrComment(String replyId, String commentId, String postId) {
+        if (replyId.equals("null")) {
+            return deleteComment(commentId, postId);
+        } else {
+            return deleteReply(replyId, commentId, postId);
+        }
+    }
+
+
+    @Override
+    public BlogPost addReply(String commentId, String postId, String name, String content) {
+        BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new BlogPostException("Post Not Found"));
+        Comment comment = null;
+
+        //TO GET THE COMMENT
+        for (Comment comment1 : blogPost.getComments()) {
+            if (comment1.getId().equals(commentId)) {
+                comment = comment1;
+                break;
+            }
+        }
+
+        //ADD REPLY TO THE COMMENT
+        if (!(comment == null)) {
+            Reply reply = new Reply(content, name, commentId, true);
+            reply.setId(UUID.randomUUID().toString());
+            reply.setCreatedAt(LocalDateTime.now());
+            if (badWordsCheck.isBadWordPresent(content)) {
+                reply.setAuthorize(false);
+            }
+            comment.getReply().add(reply);
+        }
         return blogPostRepository.save(blogPost);
     }
 
     @Override
-    public BlogPost addReply(String postId, String commentId, String name, String content) {
-        BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new BlogPostException("Post Not Found"));
+    public List<Reply> getAllReplies() {
+        List<BlogPost> allBlogs = blogPostRepository.findAll();
 
-        List<Comment> comment = blogPost.getComments();
+        List<Comment> commentList = allBlogs.stream().map(BlogPost::getComments).flatMap(Collection::stream).collect(Collectors.toList());
 
-        Comment commentToEdit = null;
-        for (Comment comment1 : comment) {
-            if (comment1.getId().equals(commentId)) {
-                commentToEdit = comment1;
-            }
-        }
-        if (commentToEdit == null) {
-            throw new BlogPostException("Comment With Id " + commentId + " Not inside post");
-        }
-
-
-        Reply reply = repository.save(new Reply(content, name, commentId));
-        commentToEdit.getReply().add(reply);
-        commentRepository.save(commentToEdit);
-        return blogPostRepository.save(blogPost);
+        return commentList.stream().map(Comment::getReply).flatMap(Collection::stream).collect(Collectors.toList());
     }
+
+    @Override
+    public void unAuthorize(String replyId, String commentId, String postId) {
+        if (replyId.equals("null")) {
+            unAuthorizeComment(commentId, postId);
+        } else {
+            unAuthorizeReply(replyId, commentId, postId);
+        }
+
+    }
+
 
     //UTIL METHODS
     private void mapRequestToEntity(BlogPost blogPost, CreatePostRequest createPostRequest) {
@@ -217,5 +265,64 @@ public class BlogPostServiceImpl implements BlogPostService {
 
         blogPost.setCreatedDate(formattedDate);
         blogPost.setUpdatedDate(formattedDate);
+    }
+
+    private void unAuthorizeComment(String commentId, String postId) {
+        BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new BlogPostException("Post Not Found"));
+        for (Comment comment : blogPost.getComments()) {
+            if (comment.getId().equals(commentId)) {
+                comment.setAuthorized(!comment.isAuthorized());
+            }
+        }
+        blogPostRepository.save(blogPost);
+    }
+
+    private void unAuthorizeReply(String replyId, String commentId, String postId) {
+        BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new BlogPostException("Post Not Found"));
+        Comment comment = null;
+
+        //TO GET THE COMMENT
+        for (Comment comment1 : blogPost.getComments()) {
+            if (comment1.getId().equals(commentId)) {
+                comment = comment1;
+                break;
+            }
+        }
+
+        //GET REPLIES IN THE COMMENT
+        if (comment != null) {
+            List<Reply> replies = comment.getReply();
+
+            //CHECK FOR THE REPLY
+            for (Reply reply : replies) {
+                if (reply.getId().equals(replyId)) {
+                    System.out.println(reply.isAuthorize());
+                    reply.setAuthorize(!reply.isAuthorize());
+                }
+            }
+        }
+        blogPostRepository.save(blogPost);
+    }
+
+    private BlogPost deleteComment(String commentId, String postId) {
+        BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new BlogPostException("Post Not Found"));
+        List<Comment> commentList = blogPost.getComments();
+        List<Comment> newComments = commentList.stream().filter(comment -> !comment.getId().equals(commentId)).collect(Collectors.toList());
+        blogPost.setComments(newComments);
+        blogPostRepository.save(blogPost);
+        return blogPost;
+    }
+
+    private BlogPost deleteReply(String replyId, String commentId, String postId) {
+        BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new BlogPostException("Post Not Found"));
+        List<Comment> commentList = blogPost.getComments();
+        for (Comment comment : commentList) {
+            if (comment.getId().equals(commentId)) {
+                List<Reply> newReplies = comment.getReply().stream().filter(reply -> !reply.getId().equals(replyId)).collect(Collectors.toList());
+                comment.setReply(newReplies);
+            }
+        }
+        blogPostRepository.save(blogPost);
+        return blogPost;
     }
 }

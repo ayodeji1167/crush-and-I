@@ -15,8 +15,4 @@ public interface BlogPostRepository extends MongoRepository<BlogPost, String> {
     List<BlogPost> findAllByAppUser_Id(String id);
 
     Page<BlogPost> findAllByCategory(Pageable pageable, String category);
-
-    List<BlogPost> findByCategory( String category);
-
-
 }

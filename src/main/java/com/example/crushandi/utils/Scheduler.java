@@ -36,7 +36,6 @@ public class Scheduler implements CommandLineRunner {
             }
         };
         timer.scheduleAtFixedRate(task, 0, 1000 * 60 * 60);
-
     }
 }
 

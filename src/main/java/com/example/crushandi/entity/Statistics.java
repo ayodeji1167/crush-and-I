@@ -18,4 +18,5 @@ public class Statistics {
 
     private long views;
 
+    private long deletedComments;
 }
