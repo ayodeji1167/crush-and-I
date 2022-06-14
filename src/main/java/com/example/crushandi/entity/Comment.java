@@ -25,7 +25,7 @@ public class Comment {
 
     private String postName;
 
-    private boolean authorized;
+    private boolean authorize;
 
 
     private LocalDateTime createdDate;
