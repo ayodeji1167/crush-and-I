@@ -305,7 +305,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     }
 
     private BlogPost deleteComment(String commentId, String postId) {
-        BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new BlogPostException("Post Not Found"));
+        BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new BlogPostException("Post with id " + postId + " not  Found"));
         List<Comment> commentList = blogPost.getComments();
         List<Comment> newComments = commentList.stream().filter(comment -> !comment.getId().equals(commentId)).collect(Collectors.toList());
         blogPost.setComments(newComments);
