@@ -201,6 +201,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         }
         List<Comment> listOfComment = blogPost.getComments();
         listOfComment.add(comment);
+        System.out.println(comment.getCreatedDate());
         blogPostRepository.save(blogPost);
         return blogPost;
     }
