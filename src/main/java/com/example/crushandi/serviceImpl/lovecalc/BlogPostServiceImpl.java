@@ -1,5 +1,10 @@
 package com.example.crushandi.serviceImpl.lovecalc;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.PutObjectResult;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.util.IOUtils;
 import com.example.crushandi.dto.request.CreatePostRequest;
 import com.example.crushandi.entity.BlogPost;
 import com.example.crushandi.entity.Comment;
@@ -9,23 +14,17 @@ import com.example.crushandi.repository.AppUserRepository;
 import com.example.crushandi.repository.BlogPostRepository;
 import com.example.crushandi.service.BlogPostService;
 import com.example.crushandi.utils.BadWordsCheck;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,13 +36,17 @@ public class BlogPostServiceImpl implements BlogPostService {
     private final BlogPostRepository blogPostRepository;
     private final AppUserRepository appUserRepository;
     private final BadWordsCheck badWordsCheck;
+    private final AmazonS3 amazonS3;
+    @Value("${bucketname}")
+    private String bucketname;
 
 
-    public BlogPostServiceImpl(BlogPostRepository blogPostRepository, AppUserRepository appUserRepository, BadWordsCheck badWordsCheck) {
+    public BlogPostServiceImpl(BlogPostRepository blogPostRepository, AppUserRepository appUserRepository, BadWordsCheck badWordsCheck, AmazonS3 amazonS3) {
         this.blogPostRepository = blogPostRepository;
         this.appUserRepository = appUserRepository;
 
         this.badWordsCheck = badWordsCheck;
+        this.amazonS3 = amazonS3;
     }
 
     @Override
@@ -87,7 +90,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         return top3Post;
     }
 
-    public Page<BlogPost> paginatedBlog(int offSet, int pageSize, String category) {
+    public Page<BlogPost> paginatedBlogByCategory(int offSet, int pageSize, String category) {
         Pageable pageable = PageRequest.of(offSet, pageSize, Sort.by("id").descending());
         if (!category.equals("all")) {
             return blogPostRepository.findAllByCategory(pageable, category);
@@ -138,40 +141,51 @@ public class BlogPostServiceImpl implements BlogPostService {
         return blogPost;
     }
 
+    //IMAGE FUNCTIONALITIES ==============================================================================
     @Override
-    public void uploadImage(MultipartFile multipartFile) {
+    public String uploadImage(MultipartFile multipartFile) {
+        String fileName = multipartFile.getOriginalFilename();
         try {
-            String imageDirectory = "./src/main/resources/static/" + StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
-            Path uploadDir = Paths.get(imageDirectory);
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectories(uploadDir);
-            }
-            try (InputStream inputStream = multipartFile.getInputStream()) {
-                Files.copy(inputStream, uploadDir, StandardCopyOption.REPLACE_EXISTING);
-            }
-
-        } catch (IOException exception) {
-            throw new RuntimeException(exception.getMessage());
+            File file = convertMultipartToFile(multipartFile);
+            PutObjectResult putObjectResult = amazonS3.putObject(bucketname, fileName, file);
+            file.delete();
+            return putObjectResult.getContentMd5();
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
         }
+
     }
 
     @Override
-    public Resource returnImage(String imageName) {
-        Path path = Paths.get("./src/main/resources/static/").toAbsolutePath().resolve(imageName);
-        Resource resource;
+    public String deleteImage(String imageName) {
+        amazonS3.deleteObject(bucketname,imageName);
+        return "Object With Name " + imageName+ " Deleted";
+    }
+
+    @Override
+    public byte[] returnImage(String imageName) {
+//        Path path = Paths.get("./src/main/resources/static/").toAbsolutePath().resolve(imageName);
+//        Resource resource;
+//        try {
+//            resource = new UrlResource(path.toUri());
+//        } catch (MalformedURLException e) {
+//            throw new RuntimeException("Unable to get file " + e.getMessage());
+//        }
+//        if (!resource.exists() || !resource.isReadable()) {
+//            throw new RuntimeException("Resource is  unable to read file");
+//        }
+//        return resource;
+        S3Object s3Object = amazonS3.getObject(bucketname,imageName);
+        S3ObjectInputStream objectContent = s3Object.getObjectContent();
         try {
-            resource = new UrlResource(path.toUri());
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Unable to get file " + e.getMessage());
+            return IOUtils.toByteArray(objectContent);
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
         }
-        if (!resource.exists() || !resource.isReadable()) {
-            throw new RuntimeException("Resource is  unable to read file");
-        }
-        return resource;
 
     }
 
-    //COMMENTS AND REPLY METHODS
+    //COMMENTS AND REPLY METHODS=================================================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     public BlogPost addComment(String postId, String name, String content) {
         BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(() -> new BlogPostException("Post Not Found"));
         Comment comment = new Comment();
@@ -253,12 +267,13 @@ public class BlogPostServiceImpl implements BlogPostService {
     }
 
 
-    //UTIL METHODS
+    //UTIL METHODS --------------------------------------------------------------------------------------------------------
     private void mapRequestToEntity(BlogPost blogPost, CreatePostRequest createPostRequest) {
         blogPost.setTitle(createPostRequest.getTitle());
         blogPost.setCategory(createPostRequest.getCategory());
         blogPost.setContent(createPostRequest.getContent());
         blogPost.setMainImage(createPostRequest.getImageName());
+        blogPost.setTags(createPostRequest.getTags());
 
         LocalDate date = LocalDate.now();
         String formattedDate = date.format(DateTimeFormatter.ofPattern("MMMM dd yyyy"));
@@ -325,4 +340,14 @@ public class BlogPostServiceImpl implements BlogPostService {
         blogPostRepository.save(blogPost);
         return blogPost;
     }
+
+    private File convertMultipartToFile(MultipartFile multipartFile) throws IOException {
+        File file = new File(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+        FileOutputStream fos = new FileOutputStream(file);
+        fos.write(multipartFile.getBytes());
+        fos.close();
+        return file;
+    }
+
+
 }

@@ -7,7 +7,7 @@ import com.example.crushandi.dto.request.UnAuthorize;
 import com.example.crushandi.entity.BlogPost;
 import com.example.crushandi.entity.Comment;
 import com.example.crushandi.service.BlogPostService;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -52,7 +52,7 @@ public class BlogController {
                                                @RequestParam("pageSize") int pageSize,
                                                @RequestParam("category") String category) {
         System.out.println("i was called");
-        return ResponseEntity.ok(blogPostService.paginatedBlog(offSet, pageSize, category));
+        return ResponseEntity.ok(blogPostService.paginatedBlogByCategory(offSet, pageSize, category));
 
     }
 
@@ -67,22 +67,6 @@ public class BlogController {
         return blogPostService.getPopularPosts();
     }
 
-    @PostMapping("/upload/image")
-    public void uploadImage(@RequestParam("file") MultipartFile multipartFile) {
-        blogPostService.uploadImage(multipartFile);
-    }
-
-    @GetMapping("/image/get/{imageName}")
-    public ResponseEntity<?> getImage(@PathVariable String imageName) {
-        Resource resource = blogPostService.returnImage(imageName);
-
-        MediaType mediaType = MediaType.IMAGE_JPEG;
-
-        return ResponseEntity.ok()
-                .contentType(mediaType)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline;fileName=" + resource.getFilename())
-                .body(resource);
-    }
 
     @GetMapping("/get/{id}")
     public BlogPost getPostById(@PathVariable String id) {
@@ -102,7 +86,6 @@ public class BlogController {
 
     @PutMapping("/edit/{id}")
     public void editPost(@PathVariable String id, @RequestBody @Valid CreatePostRequest createPostRequest) {
-
         blogPostService.editPost(id, createPostRequest);
     }
 
@@ -115,6 +98,37 @@ public class BlogController {
     public void deletePostsByUserId(@PathVariable String id) {
         blogPostService.deleteAllPostByUserId(id);
     }
+
+    //IMAGE FUNCTIONALITIES =================================================
+    @PostMapping("/upload/image")
+    public String uploadImage(@RequestParam("file") MultipartFile multipartFile) {
+        return blogPostService.uploadImage(multipartFile);
+    }
+
+    @GetMapping("/image/get/{imageName}")
+    public ResponseEntity<ByteArrayResource> getImage(@PathVariable String imageName) {
+        byte[] bytes = blogPostService.returnImage(imageName);
+        ByteArrayResource byteArrayResource = new ByteArrayResource(bytes);
+        MediaType mediaType = MediaType.IMAGE_JPEG;
+
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline;fileName=" + imageName)
+                .body(byteArrayResource);
+//        HttpHeaders httpHeaders = new HttpHeaders();
+//        httpHeaders.add("Content-type", MediaType.IMAGE_JPEG);
+//        httpHeaders.add("Content-Disposition", "inline; filename=" + imageName);
+//        byte[] bytes = blogPostService.returnImage(imageName);
+//        ByteArrayResource byteArrayResource = new ByteArrayResource(bytes);
+//        return ResponseEntity.status(HttpStatus.OK).headers(httpHeaders).body(byteArrayResource);
+
+    }
+
+    @DeleteMapping("/image/{imageName}")
+    public String deleteImage(@PathVariable String imageName) {
+        return blogPostService.deleteImage(imageName);
+    }
+
 
     // CONTROLLER FOR REPLY AND COMMENTS;
     @PostMapping("/add/comment/{postId}")

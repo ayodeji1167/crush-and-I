@@ -15,6 +15,8 @@ public class CreatePostRequest {
     @NotBlank
     private String category;
 
+    private String tags;
+
     private String imageName;
 
     private String userId;

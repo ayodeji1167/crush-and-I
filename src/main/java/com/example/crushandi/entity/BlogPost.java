@@ -33,6 +33,8 @@ public class BlogPost {
     @NotBlank
     private String category;
 
+    private String tags;
+
     private int view;
 
     @JsonIgnoreProperties(value = {"role", "email", "password"})

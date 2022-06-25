@@ -19,10 +19,10 @@ public class LoveQuotesController {
 
 
     //POPULATE LOVE QUOTES DB;
-    @GetMapping("/saveall")
-    public void saveAllQuotesFromApi() throws URISyntaxException {
-        loveQuotesService.addLoveQuotesFromApi();
-    }
+//    @GetMapping("/saveall")
+//    public void saveAllQuotesFromApi() throws URISyntaxException {
+//        loveQuotesService.addLoveQuotesFromApi();
+//    }
 
 
     @GetMapping("/get/all")
